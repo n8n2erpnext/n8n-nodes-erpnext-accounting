@@ -1,0 +1,133 @@
+[
+  {
+    "id": "accSubmitCancelJournalEntry01",
+    "name": "ERPNext Accounting Submit Cancel Journal Entry Test",
+    "active": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "erpnext-accounting-submit-journal-entry-test",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          -120
+        ],
+        "id": "5a14a3f4-0934-4559-b51c-cb0f73532a65",
+        "name": "POST Submit Webhook",
+        "webhookId": "erpnext-accounting-submit-journal-entry-test"
+      },
+      {
+        "parameters": {
+          "resource": "journalEntry",
+          "apiVersion": "v2",
+          "operation": "submit",
+          "documentName": "ACC-JV-2026-00001"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          280,
+          -120
+        ],
+        "id": "66871275-2f34-4f63-a24b-25744275aa46",
+        "name": "Submit Journal Entry",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "erpnext-accounting-cancel-journal-entry-test",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          120
+        ],
+        "id": "4ee3f9be-803d-4097-9892-6c5801a175d6",
+        "name": "POST Cancel Webhook",
+        "webhookId": "erpnext-accounting-cancel-journal-entry-test"
+      },
+      {
+        "parameters": {
+          "resource": "journalEntry",
+          "apiVersion": "v2",
+          "operation": "cancel",
+          "documentName": "ACC-JV-2026-00001"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          280,
+          120
+        ],
+        "id": "2acb4ad7-33fd-4f0c-8af1-59d3f6f507f6",
+        "name": "Cancel Journal Entry",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "POST Submit Webhook": {
+        "main": [
+          [
+            {
+              "node": "Submit Journal Entry",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Submit Journal Entry": {
+        "main": [
+          []
+        ]
+      },
+      "POST Cancel Webhook": {
+        "main": [
+          [
+            {
+              "node": "Cancel Journal Entry",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Cancel Journal Entry": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": null,
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "tags": []
+  }
+]

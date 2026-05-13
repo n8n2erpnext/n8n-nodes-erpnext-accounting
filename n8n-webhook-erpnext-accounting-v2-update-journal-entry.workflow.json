@@ -1,0 +1,78 @@
+[
+  {
+    "id": "accUpdateJournalEntryV2Test01",
+    "name": "ERPNext Accounting V2 Update Journal Entry Test",
+    "active": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "erpnext-accounting-v2-update-journal-entry-test",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "dc4e37a6-e3db-4187-bdc8-99a592f65cde",
+        "name": "POST Webhook",
+        "webhookId": "erpnext-accounting-v2-update-journal-entry-test"
+      },
+      {
+        "parameters": {
+          "resource": "journalEntry",
+          "apiVersion": "v2",
+          "operation": "update",
+          "documentName": "ACC-JV-2026-00001",
+          "dataJson": "{\"user_remark\":\"n8n Accounting node API v2 update test passed. Draft remains unsubmitted; no GL Entry created.\"}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          260,
+          0
+        ],
+        "id": "f04491d8-7a7c-4abd-87b8-d3cdf14d0712",
+        "name": "Update Draft Journal Entry V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "POST Webhook": {
+        "main": [
+          [
+            {
+              "node": "Update Draft Journal Entry V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Draft Journal Entry V2": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": null,
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "tags": []
+  }
+]

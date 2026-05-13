@@ -1,0 +1,133 @@
+[
+  {
+    "id": "accGetJournalEntryById01",
+    "name": "ERPNext Accounting GET Journal Entry By ID Webhooks",
+    "active": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "GET",
+          "path": "erpnext-accounting-get-journal-entry",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          -120
+        ],
+        "id": "f6f36622-5db5-49d1-ad86-252d966b3d10",
+        "name": "GET Journal Entry Webhook",
+        "webhookId": "erpnext-accounting-get-journal-entry"
+      },
+      {
+        "parameters": {
+          "resource": "journalEntry",
+          "apiVersion": "v1",
+          "operation": "get",
+          "documentName": "={{$json.query.name || \"ACC-JV-2026-00001\"}}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          280,
+          -120
+        ],
+        "id": "a0d48d55-9db4-4c9a-96e7-b3145ccde849",
+        "name": "Get Journal Entry V1",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "httpMethod": "GET",
+          "path": "erpnext-accounting-v2-get-journal-entry",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          120
+        ],
+        "id": "c4439c7c-b611-47f2-88c5-82a978cd971d",
+        "name": "GET Journal Entry V2 Webhook",
+        "webhookId": "erpnext-accounting-v2-get-journal-entry"
+      },
+      {
+        "parameters": {
+          "resource": "journalEntry",
+          "apiVersion": "v2",
+          "operation": "get",
+          "documentName": "={{$json.query.name || \"ACC-JV-2026-00001\"}}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          280,
+          120
+        ],
+        "id": "09bd6e27-2990-45d4-8ffe-8265e736543b",
+        "name": "Get Journal Entry V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "GET Journal Entry Webhook": {
+        "main": [
+          [
+            {
+              "node": "Get Journal Entry V1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Journal Entry V1": {
+        "main": [
+          []
+        ]
+      },
+      "GET Journal Entry V2 Webhook": {
+        "main": [
+          [
+            {
+              "node": "Get Journal Entry V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Journal Entry V2": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": null,
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "tags": []
+  }
+]

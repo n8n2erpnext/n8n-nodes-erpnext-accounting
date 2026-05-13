@@ -1,0 +1,77 @@
+[
+  {
+    "id": "accCreateJournalEntryV2Test01",
+    "name": "ERPNext Accounting V2 Create Journal Entry Test",
+    "active": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "GET",
+          "path": "erpnext-accounting-v2-create-journal-entry-test",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "2c61d66a-39de-438d-bdc8-4ce5424d7cb5",
+        "name": "GET Webhook",
+        "webhookId": "erpnext-accounting-v2-create-journal-entry-test"
+      },
+      {
+        "parameters": {
+          "resource": "journalEntry",
+          "apiVersion": "v2",
+          "operation": "create",
+          "dataJson": "{\"voucher_type\":\"Journal Entry\",\"company\":\"Thái Duy Digital\",\"posting_date\":\"2026-05-14\",\"user_remark\":\"n8n Accounting node API v2 nested accounts draft test. Do not submit.\",\"accounts\":[{\"account\":\"1110 - Cash - TDD\",\"debit_in_account_currency\":1000,\"credit_in_account_currency\":0},{\"account\":\"3300 - Opening Balance Equity - TDD\",\"debit_in_account_currency\":0,\"credit_in_account_currency\":1000}]}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          260,
+          0
+        ],
+        "id": "f9fb0f64-f475-4af9-9901-a592bc0bd5f0",
+        "name": "Create Draft Journal Entry V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "GET Webhook": {
+        "main": [
+          [
+            {
+              "node": "Create Draft Journal Entry V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Draft Journal Entry V2": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": null,
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "tags": []
+  }
+]

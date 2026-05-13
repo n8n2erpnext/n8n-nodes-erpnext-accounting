@@ -1,0 +1,81 @@
+[
+  {
+    "id": "accGetAccounts01",
+    "name": "ERPNext Accounting GET Accounts Webhook",
+    "active": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "GET",
+          "path": "erpnext-accounting-get-accounts",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "2115df16-71d9-4fae-8d96-beb4eb822691",
+        "name": "GET Webhook",
+        "webhookId": "erpnext-accounting-get-accounts"
+      },
+      {
+        "parameters": {
+          "resource": "account",
+          "apiVersion": "v1",
+          "operation": "getMany",
+          "fields": "name,account_name,account_number,company,account_type,is_group",
+          "filtersJson": "[]",
+          "returnAll": false,
+          "limit": 20,
+          "orderBy": "modified desc"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          260,
+          0
+        ],
+        "id": "5f51960b-d8ad-4b81-b794-8635d08be0b1",
+        "name": "Get Accounts",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "GET Webhook": {
+        "main": [
+          [
+            {
+              "node": "Get Accounts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Accounts": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": null,
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "tags": []
+  }
+]
