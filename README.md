@@ -31,8 +31,16 @@ Typical users:
 
 All `n8n2erpnext` module nodes use the same ERPNext-style logo shape. Each module changes only the main background color.
 
-- HRMS: green
-- Accounting: orange-red `#D94A2B`
+| Module | Color | Hex | Reason |
+| --- | --- | --- | --- |
+| Core | ERPNext blue | `#2490EF` | Foundation package, closest to the ERPNext brand color. |
+| HRMS | People green | `#2E7D5F` | Human operations, employees, attendance, leave, payroll. |
+| Accounting | Finance orange-red | `#D94A2B` | Ledger, journals, invoices, financial control. |
+| Buying | Procurement amber | `#C47F00` | Purchase flow, suppliers, RFQs, purchase orders, spend. |
+| Selling | Commerce teal | `#00A6A6` | Customer-facing pipeline, quotations, sales orders, revenue. |
+| Stock | Frappe black | `#171717` | Warehouses, items, inventory movement; aligned with Frappe black. |
+
+When building another module, copy the HRMS/Accounting SVG structure and change only the main background fill to that module color.
 
 ## Operations
 
