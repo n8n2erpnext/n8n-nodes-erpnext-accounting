@@ -1,0 +1,129 @@
+[
+  {
+    "id": "accStressSecurityV2Test01",
+    "name": "ERPNext Accounting V2 Stress And Security Test",
+    "active": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "erpnext-accounting-v2-stress-security-test",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -560,
+          0
+        ],
+        "id": "e2fb2aba-4f32-41d0-b0f0-a2e0e4bc8583",
+        "name": "POST Webhook",
+        "webhookId": "erpnext-accounting-v2-stress-security-test"
+      },
+      {
+        "parameters": {
+          "jsCode": "const first = $input.first().json;\nconst body = first.body || {};\nconst query = first.query || {};\nconst requested = Number(body.iterations ?? query.iterations ?? 10);\nconst iterations = Math.max(1, Math.min(Number.isFinite(requested) ? requested : 10, 25));\nreturn Array.from({ length: iterations }, (_, index) => ({ json: { iteration: index + 1, iterations, startedAt: new Date().toISOString() } }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -320,
+          0
+        ],
+        "id": "e3011d8f-c366-4d0d-9f44-8681780e47c2",
+        "name": "Build Bounded Stress Items"
+      },
+      {
+        "parameters": {
+          "resource": "account",
+          "apiVersion": "v2",
+          "operation": "getMany",
+          "fields": "name,account_name,company,account_type,is_group",
+          "filtersJson": "[]",
+          "returnAll": false,
+          "limit": 5,
+          "orderBy": "modified desc"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          -80,
+          0
+        ],
+        "id": "af602447-f89e-48ba-9569-cf78248b9e8f",
+        "name": "Read Accounts V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const rows = $input.all().map((item) => item.json);\nconst serialized = JSON.stringify(rows);\nconst patterns = [/api[_-]?key/i, /api[_-]?secret/i, /authorization/i, /token\\s+[A-Za-z0-9]/i, /password/i];\nconst leakedPatterns = patterns.filter((pattern) => pattern.test(serialized)).map((pattern) => pattern.toString());\nconst iterations = $('Build Bounded Stress Items').all().length;\nconst uniqueAccounts = new Set(rows.map((row) => row.name).filter(Boolean));\nreturn [{\n  json: {\n    status: leakedPatterns.length === 0 ? 'passed' : 'needs_review',\n    requestedIterations: iterations,\n    accountRowsReturned: rows.length,\n    uniqueAccountCount: uniqueAccounts.size,\n    leakedPatterns,\n    maxIterationsPolicy: 25,\n    responsePolicy: 'Read-only stress test. Returns counts and leak-scan findings only; no credentials, Authorization header, API key, API secret, or raw upstream error body is returned.'\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          160,
+          0
+        ],
+        "id": "b0aed8f2-72a9-4359-88eb-bc740ea9fb3b",
+        "name": "Return Safe Stress Summary"
+      }
+    ],
+    "connections": {
+      "POST Webhook": {
+        "main": [
+          [
+            {
+              "node": "Build Bounded Stress Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Bounded Stress Items": {
+        "main": [
+          [
+            {
+              "node": "Read Accounts V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Accounts V2": {
+        "main": [
+          [
+            {
+              "node": "Return Safe Stress Summary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Return Safe Stress Summary": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": null,
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "tags": []
+  }
+]

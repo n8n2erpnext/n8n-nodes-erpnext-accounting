@@ -1,0 +1,595 @@
+[
+  {
+    "id": "accBusinessLifecycleV2Test01",
+    "name": "ERPNext Accounting V2 Business Lifecycle Test",
+    "active": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "erpnext-accounting-v2-business-lifecycle-test",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -980,
+          0
+        ],
+        "id": "b0fd9121-4bbb-48f3-a2e3-c68ab1d31855",
+        "name": "POST Webhook",
+        "webhookId": "erpnext-accounting-v2-business-lifecycle-test"
+      },
+      {
+        "parameters": {
+          "jsCode": "const now = new Date();\nconst stamp = now.toISOString().slice(0, 10);\nconst runId = `N8N-ACC-LIFECYCLE-${Date.now()}`;\nreturn [{\n  json: {\n    runId,\n    company: 'Thái Duy Digital',\n    postingDate: stamp,\n    dueDate: stamp,\n    customerName: `${runId} Customer`,\n    supplierName: `${runId} Supplier`,\n    salesItemCode: `${runId}-SALES-SERVICE`,\n    purchaseItemCode: `${runId}-PURCHASE-SERVICE`,\n    salesAmount: 1500,\n    purchaseAmount: 600,\n    netIncome: 900,\n    accounts: {\n      cash: '1110 - Cash - TDD',\n      receivable: '1310 - Debtors - TDD',\n      payable: '2110 - Creditors - TDD',\n      sales: '4110 - Sales - TDD',\n      expense: '5111 - Cost of Goods Sold - TDD',\n      closing: '3300 - Opening Balance Equity - TDD'\n    }\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -740,
+          0
+        ],
+        "id": "fd33a202-59b3-4382-9ef7-df0ecc29bdb6",
+        "name": "Build Run Context"
+      },
+      {
+        "parameters": {
+          "resource": "customDocType",
+          "apiVersion": "v2",
+          "operation": "create",
+          "customDocType": "Customer",
+          "dataJson": "={{ JSON.stringify({ customer_name: $node[\"Build Run Context\"].json.customerName, customer_type: 'Company', customer_group: 'Individual', territory: 'Vietnam' }) }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          -500,
+          0
+        ],
+        "id": "f3783376-c77c-45f9-a39e-cd1d663b5d29",
+        "name": "Create Test Customer",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "customDocType",
+          "apiVersion": "v2",
+          "operation": "create",
+          "customDocType": "Supplier",
+          "dataJson": "={{ JSON.stringify({ supplier_name: $node[\"Build Run Context\"].json.supplierName, supplier_type: 'Company', supplier_group: 'All Supplier Groups' }) }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          -260,
+          0
+        ],
+        "id": "f80c6984-5474-44ea-bcb2-f5589c087e4b",
+        "name": "Create Test Supplier",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "customDocType",
+          "apiVersion": "v2",
+          "operation": "create",
+          "customDocType": "Item",
+          "dataJson": "={{ JSON.stringify({ item_code: $node[\"Build Run Context\"].json.salesItemCode, item_name: $node[\"Build Run Context\"].json.salesItemCode, item_group: 'Services', stock_uom: 'Unit', is_stock_item: 0, is_sales_item: 1, is_purchase_item: 0 }) }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          -20,
+          0
+        ],
+        "id": "dad1c3f2-8192-4b7c-8271-8e4247c3a460",
+        "name": "Create Sales Service Item",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "customDocType",
+          "apiVersion": "v2",
+          "operation": "create",
+          "customDocType": "Item",
+          "dataJson": "={{ JSON.stringify({ item_code: $node[\"Build Run Context\"].json.purchaseItemCode, item_name: $node[\"Build Run Context\"].json.purchaseItemCode, item_group: 'Services', stock_uom: 'Unit', is_stock_item: 0, is_sales_item: 0, is_purchase_item: 1 }) }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          220,
+          0
+        ],
+        "id": "c74ea151-f561-4f44-8c08-ef3d23a62c58",
+        "name": "Create Purchase Service Item",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "salesInvoice",
+          "apiVersion": "v2",
+          "operation": "create",
+          "dataJson": "={{ JSON.stringify({ customer: $node[\"Build Run Context\"].json.customerName, company: $node[\"Build Run Context\"].json.company, posting_date: $node[\"Build Run Context\"].json.postingDate, due_date: $node[\"Build Run Context\"].json.dueDate, debit_to: $node[\"Build Run Context\"].json.accounts.receivable, remarks: `${$node[\"Build Run Context\"].json.runId} sales invoice lifecycle test`, items: [{ item_code: $node[\"Build Run Context\"].json.salesItemCode, qty: 1, rate: $node[\"Build Run Context\"].json.salesAmount, income_account: $node[\"Build Run Context\"].json.accounts.sales }] }) }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          460,
+          0
+        ],
+        "id": "eac8c9f9-7537-42a8-a238-d4d9e43aab7d",
+        "name": "Create Draft Sales Invoice V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "salesInvoice",
+          "apiVersion": "v2",
+          "operation": "submit",
+          "documentName": "={{ $json.name }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          700,
+          0
+        ],
+        "id": "ca16d1f7-834f-4a70-bb32-29cc3cd67742",
+        "name": "Submit Sales Invoice V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "paymentEntry",
+          "apiVersion": "v2",
+          "operation": "create",
+          "dataJson": "={{ JSON.stringify({ payment_type: 'Receive', company: $node[\"Build Run Context\"].json.company, posting_date: $node[\"Build Run Context\"].json.postingDate, party_type: 'Customer', party: $node[\"Build Run Context\"].json.customerName, paid_from: $node[\"Build Run Context\"].json.accounts.receivable, paid_to: $node[\"Build Run Context\"].json.accounts.cash, paid_amount: $node[\"Build Run Context\"].json.salesAmount, received_amount: $node[\"Build Run Context\"].json.salesAmount, remarks: `${$node[\"Build Run Context\"].json.runId} receive customer payment`, references: [{ reference_doctype: 'Sales Invoice', reference_name: $node[\"Submit Sales Invoice V2\"].json.name, allocated_amount: $node[\"Build Run Context\"].json.salesAmount }] }) }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          940,
+          0
+        ],
+        "id": "f7b51138-e622-47c0-bb73-68a301f14f2e",
+        "name": "Create Receive Payment Entry V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "paymentEntry",
+          "apiVersion": "v2",
+          "operation": "submit",
+          "documentName": "={{ $json.name }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          1180,
+          0
+        ],
+        "id": "b08e85fe-a48f-4b37-9eaa-429b2172d894",
+        "name": "Submit Receive Payment Entry V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "purchaseInvoice",
+          "apiVersion": "v2",
+          "operation": "create",
+          "dataJson": "={{ JSON.stringify({ supplier: $node[\"Build Run Context\"].json.supplierName, company: $node[\"Build Run Context\"].json.company, posting_date: $node[\"Build Run Context\"].json.postingDate, due_date: $node[\"Build Run Context\"].json.dueDate, credit_to: $node[\"Build Run Context\"].json.accounts.payable, remarks: `${$node[\"Build Run Context\"].json.runId} purchase invoice lifecycle test`, items: [{ item_code: $node[\"Build Run Context\"].json.purchaseItemCode, qty: 1, rate: $node[\"Build Run Context\"].json.purchaseAmount, expense_account: $node[\"Build Run Context\"].json.accounts.expense }] }) }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          1420,
+          0
+        ],
+        "id": "e21986dc-e871-4434-b04f-c9323f248c7d",
+        "name": "Create Draft Purchase Invoice V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "purchaseInvoice",
+          "apiVersion": "v2",
+          "operation": "submit",
+          "documentName": "={{ $json.name }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          1660,
+          0
+        ],
+        "id": "d7135c49-b609-4bb2-afc3-65e65f5f899e",
+        "name": "Submit Purchase Invoice V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "paymentEntry",
+          "apiVersion": "v2",
+          "operation": "create",
+          "dataJson": "={{ JSON.stringify({ payment_type: 'Pay', company: $node[\"Build Run Context\"].json.company, posting_date: $node[\"Build Run Context\"].json.postingDate, party_type: 'Supplier', party: $node[\"Build Run Context\"].json.supplierName, paid_from: $node[\"Build Run Context\"].json.accounts.cash, paid_to: $node[\"Build Run Context\"].json.accounts.payable, paid_amount: $node[\"Build Run Context\"].json.purchaseAmount, received_amount: $node[\"Build Run Context\"].json.purchaseAmount, remarks: `${$node[\"Build Run Context\"].json.runId} pay supplier payment`, references: [{ reference_doctype: 'Purchase Invoice', reference_name: $node[\"Submit Purchase Invoice V2\"].json.name, allocated_amount: $node[\"Build Run Context\"].json.purchaseAmount }] }) }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          1900,
+          0
+        ],
+        "id": "ded43787-06ac-44d1-9ac6-5c1f091ad49c",
+        "name": "Create Pay Payment Entry V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "paymentEntry",
+          "apiVersion": "v2",
+          "operation": "submit",
+          "documentName": "={{ $json.name }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          2140,
+          0
+        ],
+        "id": "e8cb8d05-9e1c-4e98-bcc7-0a1c565e71f1",
+        "name": "Submit Pay Payment Entry V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "journalEntry",
+          "apiVersion": "v2",
+          "operation": "create",
+          "dataJson": "={{ JSON.stringify({ voucher_type: 'Journal Entry', company: $node[\"Build Run Context\"].json.company, posting_date: $node[\"Build Run Context\"].json.postingDate, user_remark: `${$node[\"Build Run Context\"].json.runId} simulated period close: revenue minus purchase expense`, accounts: [{ account: $node[\"Build Run Context\"].json.accounts.sales, debit_in_account_currency: $node[\"Build Run Context\"].json.salesAmount, credit_in_account_currency: 0 }, { account: $node[\"Build Run Context\"].json.accounts.expense, debit_in_account_currency: 0, credit_in_account_currency: $node[\"Build Run Context\"].json.purchaseAmount }, { account: $node[\"Build Run Context\"].json.accounts.closing, debit_in_account_currency: 0, credit_in_account_currency: $node[\"Build Run Context\"].json.netIncome }] }) }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          2380,
+          0
+        ],
+        "id": "d0612f85-03c4-44f1-bdc2-5b75c788de0c",
+        "name": "Create Closing Journal Entry V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "journalEntry",
+          "apiVersion": "v2",
+          "operation": "submit",
+          "documentName": "={{ $json.name }}"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          2620,
+          0
+        ],
+        "id": "ba3f6792-5617-4f45-aeda-0662de785461",
+        "name": "Submit Closing Journal Entry V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "glEntry",
+          "apiVersion": "v2",
+          "operation": "getMany",
+          "fields": "name,posting_date,account,debit,credit,voucher_type,voucher_no,is_cancelled",
+          "filtersJson": "={{ JSON.stringify([[\"voucher_no\", \"=\", $node[\"Submit Closing Journal Entry V2\"].json.name]]) }}",
+          "returnAll": false,
+          "limit": 20,
+          "orderBy": "account asc"
+        },
+        "type": "n8n-nodes-erpnext-accounting.erpNextAccounting",
+        "typeVersion": 1,
+        "position": [
+          2860,
+          0
+        ],
+        "id": "b5359401-8c04-4abd-a6e9-210fe13fb211",
+        "name": "Get Closing GL Entries V2",
+        "credentials": {
+          "erpNextApi": {
+            "id": "9hFY985G0WpX5Xyt",
+            "name": "ERPNext account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const glRows = $input.all().map((item) => item.json);\nconst debit = glRows.reduce((sum, row) => sum + Number(row.debit || 0), 0);\nconst credit = glRows.reduce((sum, row) => sum + Number(row.credit || 0), 0);\nconst serialized = JSON.stringify(glRows);\nconst leakPatterns = [/api[_-]?key/i, /api[_-]?secret/i, /authorization/i, /token\\s+[A-Za-z0-9]/i];\nconst securityFindings = leakPatterns.filter((pattern) => pattern.test(serialized)).map((pattern) => pattern.toString());\nreturn [{\n  json: {\n    runId: $node['Build Run Context'].json.runId,\n    status: securityFindings.length === 0 && debit === credit ? 'passed' : 'needs_review',\n    salesInvoice: $node['Submit Sales Invoice V2'].json.name,\n    receivePaymentEntry: $node['Submit Receive Payment Entry V2'].json.name,\n    purchaseInvoice: $node['Submit Purchase Invoice V2'].json.name,\n    payPaymentEntry: $node['Submit Pay Payment Entry V2'].json.name,\n    closingJournalEntry: $node['Submit Closing Journal Entry V2'].json.name,\n    closingGlEntryCount: glRows.length,\n    closingDebitTotal: debit,\n    closingCreditTotal: credit,\n    securityFindings,\n    responsePolicy: 'Only document names, totals, counts, and leak-scan status are returned. Credentials and raw upstream errors are not returned by this summary node.'\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3100,
+          0
+        ],
+        "id": "ea942f98-3af6-4f66-af84-c4bb4de9ff2b",
+        "name": "Return Safe Lifecycle Summary"
+      }
+    ],
+    "connections": {
+      "POST Webhook": {
+        "main": [
+          [
+            {
+              "node": "Build Run Context",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Run Context": {
+        "main": [
+          [
+            {
+              "node": "Create Test Customer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Test Customer": {
+        "main": [
+          [
+            {
+              "node": "Create Test Supplier",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Test Supplier": {
+        "main": [
+          [
+            {
+              "node": "Create Sales Service Item",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Sales Service Item": {
+        "main": [
+          [
+            {
+              "node": "Create Purchase Service Item",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Purchase Service Item": {
+        "main": [
+          [
+            {
+              "node": "Create Draft Sales Invoice V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Draft Sales Invoice V2": {
+        "main": [
+          [
+            {
+              "node": "Submit Sales Invoice V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Submit Sales Invoice V2": {
+        "main": [
+          [
+            {
+              "node": "Create Receive Payment Entry V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Receive Payment Entry V2": {
+        "main": [
+          [
+            {
+              "node": "Submit Receive Payment Entry V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Submit Receive Payment Entry V2": {
+        "main": [
+          [
+            {
+              "node": "Create Draft Purchase Invoice V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Draft Purchase Invoice V2": {
+        "main": [
+          [
+            {
+              "node": "Submit Purchase Invoice V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Submit Purchase Invoice V2": {
+        "main": [
+          [
+            {
+              "node": "Create Pay Payment Entry V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Pay Payment Entry V2": {
+        "main": [
+          [
+            {
+              "node": "Submit Pay Payment Entry V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Submit Pay Payment Entry V2": {
+        "main": [
+          [
+            {
+              "node": "Create Closing Journal Entry V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Closing Journal Entry V2": {
+        "main": [
+          [
+            {
+              "node": "Submit Closing Journal Entry V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Submit Closing Journal Entry V2": {
+        "main": [
+          [
+            {
+              "node": "Get Closing GL Entries V2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Closing GL Entries V2": {
+        "main": [
+          [
+            {
+              "node": "Return Safe Lifecycle Summary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Return Safe Lifecycle Summary": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": null,
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "tags": []
+  }
+]
