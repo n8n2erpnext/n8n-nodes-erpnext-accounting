@@ -712,9 +712,9 @@ Recommended baseline:
 
 ## Security Notice
 
-Security notice: form-data vulnerability is acknowledged but mitigated by infrastructure/scoped API access.
+This package pins transitive `form-data` resolution with an npm `overrides` entry so `npm audit --omit=dev` reports no known vulnerabilities at release time. Keep this override in place until upstream dependencies resolve to a safe version without assistance.
 
-The current dependency tree can report a transitive `form-data` advisory through `n8n-workflow`. In this package's tested deployment model, risk is reduced by:
+In this package's tested deployment model, security risk is also reduced by:
 
 - Internal network access between n8n and ERPNext.
 - Reverse proxy or VPN controls for public endpoints.
