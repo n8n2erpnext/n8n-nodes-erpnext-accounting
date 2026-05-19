@@ -4,6 +4,19 @@ Community n8n node package for ERPNext/Frappe Accounting v15-v16.
 
 This package is part of the `n8n2erpnext` ecosystem. It focuses on common ERPNext Accounting doctypes and keeps a generic Frappe escape hatch for custom doctypes and whitelisted methods.
 
+## Connected Ecosystem Coverage
+
+Accounting is live-tested as part of a connected ERPNext business lifecycle, not as a standalone invoice or ledger reader.
+
+The Stock validation suite includes end-to-end workflows that connect Buying, Stock, Selling, and Accounting:
+
+- Standard Product Lifecycle: Supplier -> Purchase Receipt -> inventory increase -> Purchase Invoice -> Customer Sale -> Sales Invoice `update_stock = 1` -> inventory decrease.
+- Exception / After-Sales Lifecycle: sale -> return credit note -> warranty warehouse -> defective warehouse -> repair/virtual workshop -> disposal.
+- Cross-module lock validation: linked Purchase Invoice blocks unsafe Purchase Receipt cancellation, and linked Sales Invoice blocks unsafe Delivery Note cancellation.
+- Ledger validation: `Bin`, `Stock Ledger Entry`, Purchase Invoice, Sales Invoice, Credit Note, and Stock Entry documents are verified after submit.
+
+This proves the Accounting node participates in the full operational chain: supplier invoices, customer invoices, return credit notes, and the document locks that protect inventory and financial history.
+
 ## Who This Is For
 
 This package is built for teams that run ERPNext Accounting and want a controlled way to connect finance data with n8n workflows.
