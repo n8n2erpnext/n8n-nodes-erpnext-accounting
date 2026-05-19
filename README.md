@@ -1,5 +1,10 @@
 # n8n-nodes-erpnext-accounting
 
+[![Live tested](https://img.shields.io/badge/live--tested-ERPNext%20v16%20%2F%20n8n%20self--hosted%20%2F%20LXD%20%2F%20API%20v2-D94A2B)](#live-tested-status)
+[![Runtime audit](https://img.shields.io/badge/runtime%20audit-0%20vulnerabilities-2E7D5F)](#development)
+[![Node checks](https://img.shields.io/badge/n8n%20node%20lint%20%2B%20build-passing-2E7D5F)](#development)
+[![Package](https://img.shields.io/badge/package-0.1.6-2490EF)](./package.json)
+
 Community n8n node package for ERPNext/Frappe Accounting v15-v16.
 
 This package is part of the `n8n2erpnext` ecosystem. It focuses on common ERPNext Accounting doctypes and keeps a generic Frappe escape hatch for custom doctypes and whitelisted methods.
@@ -16,6 +21,24 @@ The Stock validation suite includes end-to-end workflows that connect Buying, St
 - Ledger validation: `Bin`, `Stock Ledger Entry`, Purchase Invoice, Sales Invoice, Credit Note, and Stock Entry documents are verified after submit.
 
 This proves the Accounting node participates in the full operational chain: supplier invoices, customer invoices, return credit notes, and the document locks that protect inventory and financial history.
+
+## Live-Tested Status
+
+This package has been live-tested end to end on the project ERPNext/Frappe test environment:
+
+| Area | Status |
+| --- | --- |
+| ERPNext/Frappe target | Live-tested on ERPNext v16/Frappe v16 behavior |
+| n8n runtime | Live-tested on self-hosted n8n `2.20.7-exp.0` |
+| Infrastructure | Live-tested through LXD ERPNext container at `http://10.192.135.2:8001` with host header `erp.thaiduy.digital` |
+| API coverage | Live-tested with Frappe API v1 read workflows and API v2 document workflows |
+| Module lifecycle | Sales Invoice, Purchase Invoice, Payment Entry, Journal Entry, GL Entry readback, submit/cancel, and stress/security cases |
+| Ecosystem coverage | Buying -> Stock -> Selling -> Accounting end-to-end workflows |
+| Cross-module lock coverage | Linked Purchase Invoice and linked Sales Invoice protect inventory documents from unsafe cancellation |
+| Security response policy | Public webhook responses were allowlisted summaries; `securityFindings: []` |
+| Cleanup | Temporary workflows were deactivated and verified as `404 Active version not found` |
+
+The live verification used traceable demo records in the ERPNext LXD test instance. The README intentionally includes test infrastructure routing values and document IDs, but no API keys, API secrets, Authorization headers, database passwords, npm tokens, or credential material.
 
 ## Who This Is For
 
@@ -141,6 +164,8 @@ The node authenticates with:
 Authorization: token api_key:api_secret
 ```
 
+Credential fields are marked as password fields where appropriate. Do not expose API keys, API secrets, Authorization headers, tokens, or passwords in webhook responses, logs, README examples, or package artifacts.
+
 ### Internal URL With Public Host Header
 
 When n8n and ERPNext run on the same VPS, you can point n8n at the internal ERPNext address and still send the public ERPNext host header:
@@ -149,6 +174,15 @@ When n8n and ERPNext run on the same VPS, you can point n8n at the internal ERPN
 - Site Host Header: `erp.example.com`
 
 This avoids public reverse-proxy authentication while still letting ERPNext receive the expected site host.
+
+For the current VPS/LXD test setup:
+
+```text
+Site URL: http://10.192.135.2:8001
+Site Host Header: erp.thaiduy.digital
+```
+
+This is infrastructure routing information for the project test environment, not credential material. API keys and API secrets are not included in this README.
 
 For production, create a dedicated ERPNext integration user instead of using a daily admin account. Give that user only the roles required for the workflows it runs.
 
